@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { axiosRequest } from "../utils/token";
+import { da } from "zod/locales";
 
 type Category = {
     id: number;
@@ -35,6 +36,7 @@ let initialState = {
     minPrice: '',
     maxPrice: '',
     priceError: '',
+    saleTime: 0,
 }
 
 export const getCategories = createAsyncThunk('data/getCategories',
@@ -52,7 +54,42 @@ export const getProducts = createAsyncThunk(
     pageNumber?: number;
     minPrice?: number;
     maxPrice?: number;
+    discountOnly?: boolean;
   }) {
+
+    if (info.discountOnly) {
+        const discountProducts: Product[] = []
+        let page = 1
+        let totalPage = 1
+
+        do {
+            const {data, status} = await axiosRequest.get('/Product/get-products', {
+                params: {
+                    CategoryId: info.categoryId,
+                    subCategotyId: info.subCategoryId,
+                    MinPrice: info.minPrice,
+                    MaxPrice: info.maxPrice,
+                    pageNumber: page,
+                    PageSize: 100,
+                },
+            })
+            if (status === 204) break
+
+            const items = data.data.products as Product[]
+
+            discountProducts.push(...items.filter((product) => product.hasDiscount))
+
+            totalPage = data.totalPage
+            page++
+        } while (page <= totalPage)
+
+            return {
+                products: discountProducts,
+                pageNumber: 1,
+                hasMore: false
+            }
+    }
+
     const pageNumber = info.pageNumber || 1
 
     const {data, status} = await axiosRequest.get('/Product/get-products', {
@@ -106,6 +143,9 @@ export const dataSlice = createSlice({
         setPriceError(state, action: PayloadAction<string>) {
           state.priceError = action.payload
         },
+        setSaleTime(state, action: PayloadAction<number>) {
+            state.saleTime = action.payload
+        }
     },
     extraReducers: (builder) => {
         builder.addCase(getCategories.pending, (state) => {
@@ -156,4 +196,4 @@ export const dataSlice = createSlice({
 
 export default dataSlice.reducer
 
-export const { toggleCategory, setActiveSlide, toggleCategoriesList, setMinPrice, setMaxPrice, setPriceError} = dataSlice.actions
+export const { toggleCategory, setActiveSlide, toggleCategoriesList, setMinPrice, setMaxPrice, setPriceError, setSaleTime} = dataSlice.actions

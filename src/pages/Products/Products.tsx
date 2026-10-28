@@ -15,16 +15,17 @@ export default function Products() {
     const subCategoryId = Number(searchParams.get('subCategoryId')) || undefined
 
     const minPrice = searchParams.has('minPrice') ? Number(searchParams.get('minPrice')) : undefined
-
     const maxPrice = searchParams.has('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined
+
+    const discountOnly = searchParams.get('discountOnly') === 'true'
 
     const {products, productsLoading, productsError, productsPage, hasMoreProducts} = useSelector(
         (state: RootState) => state.data
     )
 
     useEffect(() => {
-        dispatch(getProducts({categoryId, subCategoryId, minPrice, maxPrice, pageNumber: 1,}))
-    },[dispatch, categoryId, subCategoryId, minPrice, maxPrice])
+        dispatch(getProducts({categoryId, subCategoryId, minPrice, maxPrice, discountOnly, pageNumber: 1,}))
+    },[dispatch, categoryId, subCategoryId, minPrice, maxPrice, discountOnly])
 
   return (
     <main className="mx-auto w-full max-w-[1170px] px-6 pt-12 pb-20 sm:pt-14 sm:pb-24">
