@@ -5,6 +5,9 @@ import { getCategories, getProducts, setSaleTime, toggleCategory } from "../../s
 import HeroSlider from '../../components/HeroSlider'
 import { NavLink } from "react-router-dom"
 import ProductCard from "../Products/ProductCard"
+import Section3H from "./Section3H"
+import BestForSell from "./BestForSell"
+import Kalonka from "./Kalonka"
 
 export default function Home() {
 
@@ -172,6 +175,9 @@ export default function Home() {
       </NavLink>
     </div>
   </section>
+  <Section3H/>
+  <BestForSell/>
+  <Kalonka/>
     </main>
   )
 }

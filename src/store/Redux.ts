@@ -5,6 +5,7 @@ import { da } from "zod/locales";
 type Category = {
     id: number;
     categoryName: string
+    categoryImage: string
     subCategories: {
         id: number,
         subCategoryName: string
