@@ -1,8 +1,11 @@
-import React, { lazy, Suspense } from 'react'
+import { lazy, Suspense } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Loyaut from './components/Loyaut'
 
 const Home = lazy(() => import('./pages/Home/Home'))
+const Login = lazy(() => import('./pages/Login/Login'))
+const Register = lazy(() => import('./pages/Register/Register'))
+const Products = lazy(() => import('./pages/Products/Products'))
 
 export default function App() {
   const router = createBrowserRouter([
@@ -17,7 +20,31 @@ export default function App() {
               <Home/>
             </Suspense>
           )
-        }
+        },
+        {
+          path: '/login',
+          element: (
+            <Suspense fallback={<h1>Loading...</h1>}>
+              <Login/>
+            </Suspense>
+          )
+        },
+        {
+          path: '/register',
+          element: (
+            <Suspense fallback={<h1>Loading...</h1>}>
+              <Register/>
+            </Suspense>
+          )
+        },
+        {
+          path: '/products',
+          element: (
+            <Suspense fallback={<h1>Loading...</h1>}>
+              <Products />
+            </Suspense>
+          ),
+        },
       ]
     }
   ])

@@ -1,7 +1,42 @@
-import React from 'react'
+import { useState } from 'react'
+import { NavLink } from 'react-router-dom'
+import Icon from './Icon'
+import logo from '../assets/logo.png'
+
+const navLinkClass = 'relative cursor-pointer whitespace-nowrap border-0 bg-transparent py-[7px] text-sm text-[#161616] no-underline transition-colors duration-200 after:absolute after:inset-x-0 after:bottom-[3px] after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-200 hover:text-brand hover:after:scale-x-100 max-[851px]:self-start max-[851px]:py-2.5'
+const iconButtonClass = 'inline-flex h-[38px] w-[34px] cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-[5px] text-[#151515] transition duration-200 hover:-translate-y-0.5 hover:bg-[#fff1f1] hover:text-brand'
 
 export default function Header() {
+  const [menuOpen, setMenuOpen] = useState(false)
+
   return (
-    <div>Header</div>
+    <header className="relative z-10 border-b border-[#e9e9e9] bg-white">
+      <div className="mx-auto flex min-h-[86px] w-[min(1170px,calc(100%-80px))] items-center justify-between gap-8 max-[1101px]:gap-5 max-[851px]:min-h-[76px] max-[851px]:w-[calc(100%-48px)] max-[541px]:min-h-[72px] max-[541px]:w-[calc(100%-40px)] max-[541px]:gap-3">
+        <NavLink to="/" className="inline-flex shrink-0 items-center transition-transform duration-200 hover:translate-x-[3px]" aria-label="Fastcart home" onClick={() => setMenuOpen(false)}>
+          <img src={logo} alt="Fastcart" width="170" height="44" className="h-auto w-[170px] object-contain max-[541px]:w-[145px]" />
+        </NavLink>
+
+        <nav className={`items-center gap-8 max-[1101px]:gap-[22px] max-[851px]:absolute max-[851px]:inset-x-0 max-[851px]:top-[calc(100%+1px)] max-[851px]:items-stretch max-[851px]:gap-1.5 max-[851px]:border-b max-[851px]:border-[#ececec] max-[851px]:bg-white max-[851px]:px-8 max-[851px]:pt-[18px] max-[851px]:pb-6 max-[851px]:shadow-[0_16px_24px_#00000006] ${menuOpen ? 'flex max-[851px]:animate-nav-enter max-[851px]:flex-col' : 'hidden min-[851px]:flex'}`} id="store-navigation" aria-label="Main navigation">
+          <NavLink to="/" className={navLinkClass} onClick={() => setMenuOpen(false)}>Home</NavLink>
+          <NavLink to='' className={navLinkClass} type="button">Contact</NavLink>
+          <NavLink to='' className={navLinkClass} type="button">About</NavLink>
+          <NavLink to='/register' className={`${navLinkClass} `} type="button">Sign Up</NavLink>
+        </nav>
+
+        <div className="flex items-center gap-[17px] max-[1101px]:gap-2.5 max-[541px]:gap-[9px]">
+          <div className="flex w-60 items-center gap-2.5 rounded-[5px] border border-transparent bg-[#f5f5f5] py-[11px] pr-3.5 pl-[17px] transition-colors duration-200 focus-within:border-[#d5d5d5] focus-within:bg-white max-[1101px]:w-[200px] max-[851px]:w-[190px] max-[541px]:hidden" role="search">
+            <input className="min-w-0 w-full border-0 bg-transparent text-[11px] text-[#161616] outline-none placeholder:text-[#818181] focus-visible:outline-none!" type="search" aria-label="Search products" placeholder="What are you looking for?" />
+            <Icon className="shrink-0" name="search" width="20" height="20" />
+          </div>
+          <button className={`${iconButtonClass} max-[541px]:hidden`} type="button" aria-label="Wishlist"><Icon name="heart" /></button>
+          <button className={`${iconButtonClass} relative`} type="button" aria-label="Shopping cart, 2 items">
+            <Icon name="cart" /><span className="absolute top-0 right-0 grid h-[15px] min-w-[15px] place-items-center rounded-full border-2 border-white bg-brand px-[3px] text-[9px] leading-none text-white">2</span>
+          </button>
+          <button className={`${iconButtonClass} min-[851px]:hidden`} type="button" aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={menuOpen} aria-controls="store-navigation" onClick={() => setMenuOpen(!menuOpen)}>
+            <Icon name={menuOpen ? 'close' : 'menu'} />
+          </button>
+        </div>
+      </div>
+    </header>
   )
 }
