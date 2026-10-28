@@ -8,6 +8,9 @@ import ProductCard from "../Products/ProductCard"
 import Section3H from "./Section3H"
 import BestForSell from "./BestForSell"
 import Kalonka from "./Kalonka"
+import OurProduct from "./ourProduct"
+import NewArrival from "./NewArrival"
+
 
 export default function Home() {
 
@@ -178,6 +181,8 @@ export default function Home() {
   <Section3H/>
   <BestForSell/>
   <Kalonka/>
+  <OurProduct/>
+  <NewArrival/>
     </main>
   )
 }

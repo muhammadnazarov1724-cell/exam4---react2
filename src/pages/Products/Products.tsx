@@ -18,14 +18,15 @@ export default function Products() {
     const maxPrice = searchParams.has('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined
 
     const discountOnly = searchParams.get('discountOnly') === 'true'
+    const productsName = searchParams.get('search')?.trim() || undefined
 
     const {products, productsLoading, productsError, productsPage, hasMoreProducts} = useSelector(
         (state: RootState) => state.data
     )
 
     useEffect(() => {
-        dispatch(getProducts({categoryId, subCategoryId, minPrice, maxPrice, discountOnly, pageNumber: 1,}))
-    },[dispatch, categoryId, subCategoryId, minPrice, maxPrice, discountOnly])
+        dispatch(getProducts({categoryId, subCategoryId, minPrice, maxPrice, discountOnly, productsName, pageNumber: 1,}))
+    },[dispatch, categoryId, subCategoryId, minPrice, maxPrice, discountOnly, productsName])
 
   return (
     <main className="mx-auto w-full max-w-[1170px] px-6 pt-12 pb-20 sm:pt-14 sm:pb-24">
@@ -71,8 +72,10 @@ export default function Products() {
 
                 {!productsLoading && !productsError && products.length === 0 && (
                     <div className="rounded border border-dashed border-[#ddd] bg-[#fafafa] px-6 py-20 text-center">
-                        <p className="text-lg font-medium">В этой категории пока нет товаров</p>
-                        <NavLink className="mt-4 inline-block border-b border-brand pb-1 text-sm text-brand" to="/">Вернуться к категориям</NavLink>
+                      <p className="text-lg font-medium">
+                        {productsName ? `По запросу «${productsName}» товары не найдены` : 'В этой категории пока нет товаров'}
+                      </p>                        
+                      <NavLink className="mt-4 inline-block border-b border-brand pb-1 text-sm text-brand" to="/">Вернуться к категориям</NavLink>
                     </div>
                 )}
 
@@ -92,6 +95,7 @@ export default function Products() {
                       minPrice,
                       maxPrice,
                       subCategoryId,
+                      productsName,
                       pageNumber: productsPage + 1,
                    }))}
                   >

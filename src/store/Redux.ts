@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { axiosRequest } from "../utils/token";
 import { da } from "zod/locales";
+import Products from "../pages/Products/Products";
 
 type Category = {
     id: number;
@@ -27,6 +28,7 @@ let initialState = {
     error: '',
     openCategoryId: null as number | null,
     activeSlide: 0,
+    accountMenuOpen: false,
     products: [] as Product[],
     productsLoading: false,
     productsError: '',
@@ -38,6 +40,9 @@ let initialState = {
     maxPrice: '',
     priceError: '',
     saleTime: 0,
+    ourProducts: [] as Product[],
+    ourProductsLoading: false,
+    ourProductsError: ''   
 }
 
 export const getCategories = createAsyncThunk('data/getCategories',
@@ -51,6 +56,7 @@ export const getProducts = createAsyncThunk(
   'data/getProducts',
   async function (info: {
     categoryId?: number;
+    productsName?: string
     subCategoryId?: number;
     pageNumber?: number;
     minPrice?: number;
@@ -67,11 +73,12 @@ export const getProducts = createAsyncThunk(
             const {data, status} = await axiosRequest.get('/Product/get-products', {
                 params: {
                     CategoryId: info.categoryId,
-                    subCategotyId: info.subCategoryId,
+                    SubcategoryId: info.subCategoryId,
                     MinPrice: info.minPrice,
                     MaxPrice: info.maxPrice,
                     pageNumber: page,
                     PageSize: 100,
+                    ProductName: info.productsName,
                 },
             })
             if (status === 204) break
@@ -101,6 +108,7 @@ export const getProducts = createAsyncThunk(
         PageSize: 9,
         MinPrice: info.minPrice,
         MaxPrice: info.maxPrice,
+        ProductName: info.productsName
       },
     })
 
@@ -120,10 +128,30 @@ export const getProducts = createAsyncThunk(
   }
 )
 
+export const getOurProducts = createAsyncThunk('data/getOurProducts', 
+    async function() {
+        const {data, status} = await axiosRequest.get('/Product/get-products', {
+            params: {
+                pageNumber: 1,
+                pageSize: 8
+            },
+        })
+
+        if (status === 204) {
+            return [] as Product[]
+        }
+
+        return data.data.products as Product[]
+    }
+)
+
 export const dataSlice = createSlice({
     name: 'data',
     initialState,
     reducers: {
+        setAccountMenuOpen(state, action: PayloadAction<boolean>) {
+            state.accountMenuOpen = action.payload
+        },
         setActiveSlide(state, action: PayloadAction<number>) {
             state.activeSlide = action.payload
         },
@@ -161,40 +189,52 @@ export const dataSlice = createSlice({
         state.loading = false
         state.error = 'Не удалось загрузить категории'
        })
-.addCase(getProducts.pending, (state, action) => {
-  state.productsLoading = true
-  state.productsError = ''
-  state.productsRequestId = action.meta.requestId
+        .addCase(getProducts.pending, (state, action) => {
+          state.productsLoading = true
+          state.productsError = ''
+          state.productsRequestId = action.meta.requestId
 
-  if (!action.meta.arg.pageNumber || action.meta.arg.pageNumber === 1) {
-    state.products = []
-    state.productsPage = 1
-    state.hasMoreProducts = false
-  }
-})
-.addCase(getProducts.fulfilled, (state, action) => {
-  if (state.productsRequestId !== action.meta.requestId) return
+          if (!action.meta.arg.pageNumber || action.meta.arg.pageNumber === 1) {
+            state.products = []
+            state.productsPage = 1
+            state.hasMoreProducts = false
+          }
+        })
+        .addCase(getProducts.fulfilled, (state, action) => {
+          if (state.productsRequestId !== action.meta.requestId) return
 
-  state.productsLoading = false
-  state.productsPage = action.payload.pageNumber
-  state.hasMoreProducts = action.payload.hasMore
+          state.productsLoading = false
+          state.productsPage = action.payload.pageNumber
+          state.hasMoreProducts = action.payload.hasMore
 
-  if (action.payload.pageNumber === 1) {
-    state.products = action.payload.products
-  } else {
-    state.products.push(...action.payload.products)
-  }
-})
-.addCase(getProducts.rejected, (state, action) => {
-  if (state.productsRequestId !== action.meta.requestId) return
+          if (action.payload.pageNumber === 1) {
+            state.products = action.payload.products
+          } else {
+            state.products.push(...action.payload.products)
+          }
+        })
+        .addCase(getProducts.rejected, (state, action) => {
+          if (state.productsRequestId !== action.meta.requestId) return
 
-  state.productsLoading = false
-  state.productsError = 'Не удалось загрузить товары'
-})
-    }
+          state.productsLoading = false
+          state.productsError = 'Не удалось загрузить товары'
+        })
+        .addCase(getOurProducts.pending, (state) => {
+          state.ourProductsLoading = true
+          state.ourProductsError = ''
+        })
+        .addCase(getOurProducts.fulfilled, (state, action) => {
+          state.ourProductsLoading = false
+          state.ourProducts = action.payload
+        })
+        .addCase(getOurProducts.rejected, (state) => {
+          state.ourProductsLoading = false
+          state.ourProductsError = 'Не удалось загрузить товары'
+        })
+        }
 })
 
 
 export default dataSlice.reducer
 
-export const { toggleCategory, setActiveSlide, toggleCategoriesList, setMinPrice, setMaxPrice, setPriceError, setSaleTime} = dataSlice.actions
+export const { toggleCategory, setActiveSlide, toggleCategoriesList, setMinPrice, setMaxPrice, setPriceError, setSaleTime, setAccountMenuOpen} = dataSlice.actions
