@@ -16,6 +16,7 @@ const paths = {
   linkedin: <><path d="M4 9v12M4 3v.1M10 21V9h4v2a4 4 0 0 1 7 3v7M14 21v-7" /></>,
   menu: <path d="M3 6h18M3 12h18M3 18h18" />,
   close: <path d="m6 6 12 12M6 18 18 6" />,
+  trash: <><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7" /></>,
 } as const
 
 type IconProps = SVGProps<SVGSVGElement> & { name: keyof typeof paths }

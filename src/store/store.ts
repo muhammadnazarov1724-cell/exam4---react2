@@ -7,6 +7,22 @@ export const store = configureStore({
   }
 })
 
+let previousWishlist = store.getState().data.wishlist
+
+store.subscribe(() => {
+  const wishlist = store.getState().data.wishlist
+
+  if (wishlist === previousWishlist) 
+    return previousWishlist = wishlist
+
+  try {
+    localStorage.setItem('wishlist', JSON.stringify(wishlist))  
+  } catch (error) {
+    console.log(error);
+  }
+
+})
+
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch
 export type AppStore = typeof store

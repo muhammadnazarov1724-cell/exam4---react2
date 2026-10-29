@@ -20,6 +20,32 @@ export type Product = {
     discountPrice: number;
 }
 
+export type ProductDetails = {
+    id: number;
+    productName: string;
+    description: string;
+    brand: string;
+    color: string;
+    size: string;
+    quantity: number;
+    price: number;
+    hasDiscount: boolean;
+    discountPrice: number;
+    images: {
+        id: number;
+        images: string
+    }[];
+}
+
+function getSaveWishlist(): Product[] {
+    try {
+        const saved = JSON.parse(localStorage.getItem('wishlist') || '[]')
+        return Array.isArray(saved) ? saved : []
+    } catch (error) {
+        return[]
+    }
+}
+
 let initialState = {
     data: [] as Category[],
     loading: false,
@@ -40,7 +66,13 @@ let initialState = {
     saleTime: 0,
     ourProducts: [] as Product[],
     ourProductsLoading: false,
-    ourProductsError: ''   
+    ourProductsError: '',
+    wishlist: getSaveWishlist(),   
+    productDetails: null as ProductDetails | null,
+    detailsLoading: false,
+    detailsError: '',
+    detailsRequestId: '',
+    detailsImageIndex: 0
 }
 
 export const getCategories = createAsyncThunk('data/getCategories',
@@ -143,6 +175,20 @@ export const getOurProducts = createAsyncThunk('data/getOurProducts',
     }
 )
 
+export const getProductById = createAsyncThunk('data/getProductById',
+    async function (id: number) {
+        const {data, status} = await axiosRequest.get('/Product/get-product-by-id',
+            {    
+                params: {id}
+            }
+        ) 
+        if (status === 204 || !data.data) {
+          throw new Error('Товар не найден')
+        }
+        return data.data as ProductDetails
+    }
+)
+
 export const dataSlice = createSlice({
     name: 'data',
     initialState,
@@ -164,14 +210,38 @@ export const dataSlice = createSlice({
          state.priceError = ''
         },
         setMaxPrice(state, action: PayloadAction<string>) { 
-  state.maxPrice = action.payload
-  state.priceError = ''
+         state.maxPrice = action.payload
+         state.priceError = ''
         },
         setPriceError(state, action: PayloadAction<string>) {
           state.priceError = action.payload
         },
         setSaleTime(state, action: PayloadAction<number>) {
             state.saleTime = action.payload
+        },
+        // Для добавлении в Wishlist
+        toggleWishlist(state, action: PayloadAction<Product>) {
+            const exists = state.wishlist.some(
+                (product) => product.id === action.payload.id
+            )
+            if (exists) {
+                state.wishlist = state.wishlist.filter(
+                    (product) => product.id !== action.payload.id
+                )
+            }
+            else {
+                state.wishlist.push(action.payload)
+            }
+        },
+        // Для удалении из Wishlist
+        removeFromWishlist(state, action: PayloadAction<number>) {
+            state.wishlist = state.wishlist.filter(
+                (product) => product.id !== action.payload
+            )
+        },
+        // Для картинки Details
+        setDetailsImageIndex(state, action: PayloadAction<number>) {
+            state.detailsImageIndex = action.payload
         }
     },
     extraReducers: (builder) => {
@@ -229,10 +299,29 @@ export const dataSlice = createSlice({
           state.ourProductsLoading = false
           state.ourProductsError = 'Не удалось загрузить товары'
         })
+        .addCase(getProductById.pending, (state, action) => {
+          state.detailsLoading = true
+          state.detailsError = ''
+          state.productDetails = null
+          state.detailsImageIndex = 0
+          state.detailsRequestId = action.meta.requestId
+        })
+        .addCase(getProductById.fulfilled, (state, action) => {
+          if (state.detailsRequestId !== action.meta.requestId) return
+
+          state.detailsLoading = false
+          state.productDetails = action.payload
+        })
+        .addCase(getProductById.rejected, (state, action) => {
+          if (state.detailsRequestId !== action.meta.requestId) return
+
+          state.detailsLoading = false
+          state.detailsError = action.error.message || 'Не удалось загрузить товар'
+        })
         }
 })
 
 
 export default dataSlice.reducer
 
-export const { toggleCategory, setActiveSlide, toggleCategoriesList, setMinPrice, setMaxPrice, setPriceError, setSaleTime, setAccountMenuOpen} = dataSlice.actions
+export const { toggleCategory, setActiveSlide, toggleCategoriesList, setMinPrice, setMaxPrice, setPriceError, setSaleTime, setAccountMenuOpen, toggleWishlist, removeFromWishlist, setDetailsImageIndex} = dataSlice.actions

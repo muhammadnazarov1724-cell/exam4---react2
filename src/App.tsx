@@ -9,6 +9,9 @@ const Products = lazy(() => import('./pages/Products/Products'))
 const Account = lazy(() => import('./pages/Account/Account'))
 const Contact = lazy(() => import('./pages/Contact/Contact'))
 const About = lazy(() => import('./pages/About/About'))
+const Wishlist = lazy(() => import('./pages/Wishlist/Wishlist'))
+const InfoProduct = lazy(() => import('./pages/InfoProduct/InfoProduct'))
+
 
 export default function App() {
   const router = createBrowserRouter([
@@ -69,6 +72,22 @@ export default function App() {
           element: (
             <Suspense fallback={<h1>Loading...</h1>}>
               <About />
+            </Suspense>
+          ),
+        },
+        {
+          path: '/wishlist',
+          element: (
+            <Suspense fallback={<h1>Loading...</h1>}>
+              <Wishlist />
+            </Suspense>
+          ),
+        },
+        {
+          path: '/products/:id',
+          element: (
+            <Suspense fallback={<h1>Loading...</h1>}>
+              <InfoProduct />
             </Suspense>
           ),
         },

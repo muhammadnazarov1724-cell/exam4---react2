@@ -1,7 +1,26 @@
-import type { Product } from '../../store/Redux'
+import { removeFromWishlist, toggleWishlist, type Product } from '../../store/Redux'
 import Icon from '../../components/Icon'
+import { useDispatch, useSelector } from 'react-redux';
+import type { AppDispatch, RootState } from '../../store/store';
+import { NavLink } from 'react-router-dom';
 
-export default function ProductCard({product}: {product: Product}) {
+export default function ProductCard({product, wishlistPage =false,}: {product: Product; wishlistPage?: boolean}) {
+
+  const dispatch = useDispatch<AppDispatch>()
+
+  const inWishlist = useSelector((state: RootState) =>
+  state.data.wishlist.some((item) => item.id === product.id)
+)
+
+function handleWishlist() {
+  if (wishlistPage) {
+    dispatch(removeFromWishlist(product.id))
+  }
+  else {
+    dispatch(toggleWishlist(product))
+  }
+}
+
   const price = product.hasDiscount ? product.discountPrice : product.price
   const discount = product.hasDiscount && product.price > 0
     ? Math.round((1 - product.discountPrice / product.price) * 100)
@@ -21,15 +40,33 @@ export default function ProductCard({product}: {product: Product}) {
         )}
 
         <div className="absolute top-3 right-3 flex flex-col gap-2">
-          <button className="grid size-8 cursor-pointer place-items-center rounded-full bg-white text-black transition-colors hover:bg-brand hover:text-white" type="button" aria-label={`Add ${product.productName} to wishlist`}>
-            <Icon name="heart" width="18" height="18" />
-          </button>
-          <button className="grid size-8 cursor-pointer place-items-center rounded-full bg-white text-black transition-colors hover:bg-brand hover:text-white" type="button" aria-label={`Quick view ${product.productName}`}>
-            <Icon name="eye" width="18" height="18" />
-          </button>
+        <button
+          type="button"
+          onClick={handleWishlist}
+          aria-label={wishlistPage ? 'Удалить из избранного' : 'Добавить или убрать из избранного'}
+          aria-pressed={wishlistPage ? undefined : inWishlist}
+          className={`grid size-8 cursor-pointer place-items-center rounded-full bg-white transition-colors hover:bg-brand hover:text-white ${
+            inWishlist && !wishlistPage ? 'text-brand' : 'text-black'
+          }`}
+        >
+        <Icon
+          name={wishlistPage ? 'trash' : 'heart'}
+          width="18"
+          height="18"
+          fill={!wishlistPage && inWishlist ? 'currentColor' : 'none'}
+        />
+      </button>
+        <NavLink
+          to={`/products/${product.id}`}
+          className="grid size-8 cursor-pointer place-items-center rounded-full bg-white text-black transition-colors hover:bg-brand hover:text-white"
+        >
+          <Icon name="eye" width="18" height="18" />
+        </NavLink>
         </div>
 
-        <button className="absolute inset-x-0 bottom-0 min-h-10 cursor-pointer bg-black px-4 py-2.5 text-[13px] text-white transition duration-200 hover:bg-brand sm:translate-y-full sm:group-hover:translate-y-0 sm:group-focus-within:translate-y-0" type="button">Add To Cart</button>
+        <button className={`absolute inset-x-0 bottom-0 min-h-10 cursor-pointer bg-black px-4 py-2.5 text-[13px] text-white transition duration-200 hover:bg-brand ${
+         wishlistPage ? '' : 'sm:translate-y-full sm:group-hover:translate-y-0 sm:group-focus-within:translate-y-0'
+         }`} type="button">Add To Cart</button>
       </div>
 
       <h2 className="mt-3 truncate text-[13px] leading-6 font-medium" title={product.productName}>{product.productName}</h2>
@@ -42,7 +79,7 @@ export default function ProductCard({product}: {product: Product}) {
       </div>
 
       {/* API пока не возвращает рейтинг и количество отзывов. */}
-      <div className="mt-1 flex items-center gap-2" aria-label="Rating unavailable">
+      <div hidden={wishlistPage} className="mt-1 flex items-center gap-2" aria-label="Rating unavailable">
         <span className="text-lg leading-6 tracking-wide text-[#ffad33]" aria-hidden="true">☆☆☆☆☆</span>
         <span className="text-[11px] text-[#888]" aria-hidden="true">(—)</span>
       </div>

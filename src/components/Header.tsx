@@ -16,6 +16,7 @@ export default function Header() {
   const [searchParams] = useSearchParams()
   const dispatch = useDispatch<AppDispatch>()
   const accountMenuOpen = useSelector((state: RootState) => state.data.accountMenuOpen)
+  const wishlistCount = useSelector((state: RootState) => state.data.wishlist.length)
   const accountMenuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -64,16 +65,26 @@ export default function Header() {
             <Icon name="search" width="20" height="20" />
           </button>
           </form>
-          <button className={`${iconButtonClass} max-[541px]:hidden`} type="button" aria-label="Wishlist"><Icon name="heart" /></button>
-          <button className={`${iconButtonClass} relative`} type="button" aria-label="Shopping cart, 2 items">
+           <NavLink
+             to="/wishlist"
+             className={`${iconButtonClass} relative max-[541px]:hidden`}
+             aria-label={`Wishlist: ${wishlistCount} товаров`}
+           >
+             <Icon name="heart" />
+
+             {wishlistCount > 0 && (
+               <span className="absolute top-0 right-0 grid h-[15px] min-w-[15px] place-items-center rounded-full border-2 border-white bg-brand px-[3px] text-[9px] leading-none text-white">
+                 {wishlistCount}
+               </span>
+             )}
+           </NavLink>          
+           <button className={`${iconButtonClass} relative`} type="button" aria-label="Shopping cart, 2 items">
             <Icon name="cart" /><span className="absolute top-0 right-0 grid h-[15px] min-w-[15px] place-items-center rounded-full border-2 border-white bg-brand px-[3px] text-[9px] leading-none text-white">2</span>
           </button>
           <div className="relative shrink-0" ref={accountMenuRef}>
             <button
               type="button"
-              aria-label="Account"
-              aria-expanded={accountMenuOpen}
-              aria-controls="account-dropdown"
+ 
               onClick={() => dispatch(setAccountMenuOpen(!accountMenuOpen))}
               className={`inline-flex size-9 cursor-pointer items-center justify-center rounded-full transition-colors ${accountMenuOpen ? 'bg-brand text-white' : 'text-[#151515] hover:bg-[#fff1f1] hover:text-brand'}`}
             >
