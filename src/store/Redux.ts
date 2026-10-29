@@ -20,6 +20,10 @@ export type Product = {
     discountPrice: number;
 }
 
+export type CartItem = Product & {
+    quantity: number;
+}
+
 export type ProductDetails = {
     id: number;
     productName: string;
@@ -43,6 +47,15 @@ function getSaveWishlist(): Product[] {
         return Array.isArray(saved) ? saved : []
     } catch (error) {
         return[]
+    }
+}
+
+function getSaveCart(): CartItem[] {
+    try {
+        const saved = JSON.parse(localStorage.getItem('cart') || '[]')
+        return Array.isArray(saved) ? saved : []
+    } catch (error) {
+        return []
     }
 }
 
@@ -74,6 +87,7 @@ let initialState = {
     detailsRequestId: '',
     detailsImageIndex: 0,
     detailsQuantity: 1,
+    cart: getSaveCart()
 }
 
 export const getCategories = createAsyncThunk('data/getCategories',
@@ -266,7 +280,49 @@ export const dataSlice = createSlice({
         // Для того чтобы сделать +
         changeDetailsQuaintity(state, action: PayloadAction<number>) {
             state.detailsQuantity = Math.max(1, state.detailsQuantity + action.payload)
-        }
+        },
+       addCartItem(
+  state,
+  action: PayloadAction<{product: Product; quantity?: number}>
+) {
+  const {product} = action.payload
+  const quantity = Math.trunc(action.payload.quantity ?? 1)
+
+  if (!Number.isFinite(quantity) || quantity < 1) return
+
+  const existing = state.cart.find((item) => item.id === product.id)
+
+  if (existing) {
+    existing.quantity += quantity
+  } else {
+    state.cart.push({...product, quantity})
+  }
+},
+
+setCartQuantity(
+  state,
+  action: PayloadAction<{id: number; quantity: number}>
+) {
+  if (!Number.isFinite(action.payload.quantity)) return
+
+  const item = state.cart.find(
+    (product) => product.id === action.payload.id
+  )
+
+  if (item) {
+    item.quantity = Math.max(1, Math.trunc(action.payload.quantity))
+  }
+},
+
+removeCartItem(state, action: PayloadAction<number>) {
+  state.cart = state.cart.filter(
+    (product) => product.id !== action.payload
+  )
+},
+
+clearCart(state) {
+  state.cart = []
+},
     },
     extraReducers: (builder) => {
         builder.addCase(getCategories.pending, (state) => {
@@ -349,4 +405,4 @@ export const dataSlice = createSlice({
 
 export default dataSlice.reducer
 
-export const { toggleCategory, setActiveSlide, toggleCategoriesList, setMinPrice, setMaxPrice, setPriceError, setSaleTime, setAccountMenuOpen, toggleWishlist, removeFromWishlist, setDetailsImageIndex, changeDetailsQuaintity} = dataSlice.actions
+export const { toggleCategory, setActiveSlide, toggleCategoriesList, setMinPrice, setMaxPrice, setPriceError, setSaleTime, setAccountMenuOpen, toggleWishlist, removeFromWishlist, setDetailsImageIndex, changeDetailsQuaintity, addCartItem, setCartQuantity, removeCartItem, clearCart} = dataSlice.actions

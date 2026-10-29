@@ -8,19 +8,24 @@ export const store = configureStore({
 })
 
 let previousWishlist = store.getState().data.wishlist
+let previousCart = store.getState().data.cart
 
 store.subscribe(() => {
-  const wishlist = store.getState().data.wishlist
-
-  if (wishlist === previousWishlist) 
-    return previousWishlist = wishlist
+  const {wishlist, cart} = store.getState().data
 
   try {
-    localStorage.setItem('wishlist', JSON.stringify(wishlist))  
-  } catch (error) {
-    console.log(error);
-  }
+    if (wishlist !== previousWishlist) {
+      localStorage.setItem('wishlist', JSON.stringify(wishlist))
+      previousWishlist = wishlist
+    }
 
+    if (cart !== previousCart) {
+      localStorage.setItem('cart', JSON.stringify(cart))
+      previousCart = cart
+    }
+  } catch (error) {
+    console.log(error)
+  }
 })
 
 export type RootState = ReturnType<typeof store.getState>

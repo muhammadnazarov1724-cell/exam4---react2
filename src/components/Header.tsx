@@ -17,6 +17,7 @@ export default function Header() {
   const dispatch = useDispatch<AppDispatch>()
   const accountMenuOpen = useSelector((state: RootState) => state.data.accountMenuOpen)
   const wishlistCount = useSelector((state: RootState) => state.data.wishlist.length)
+  const cartCount = useSelector((state: RootState) => state.data.cart.reduce((sum, product) => sum + product.quantity, 0))
   const accountMenuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -78,9 +79,15 @@ export default function Header() {
                </span>
              )}
            </NavLink>          
-           <button className={`${iconButtonClass} relative`} type="button" aria-label="Shopping cart, 2 items">
-            <Icon name="cart" /><span className="absolute top-0 right-0 grid h-[15px] min-w-[15px] place-items-center rounded-full border-2 border-white bg-brand px-[3px] text-[9px] leading-none text-white">2</span>
-          </button>
+            <NavLink
+              to="/cart" className={`${iconButtonClass} relative`}>
+              <Icon name="cart" />
+              {cartCount > 0 && (
+                <span className="absolute top-0 right-0 grid h-[15px] min-w-[15px] place-items-center rounded-full border-2 border-white bg-brand px-[3px] text-[9px] leading-none text-white">
+                  {cartCount}
+                </span>
+              )}
+            </NavLink>
           <div className="relative shrink-0" ref={accountMenuRef}>
             <button
               type="button"

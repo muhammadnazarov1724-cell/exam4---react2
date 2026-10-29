@@ -11,6 +11,7 @@ const Contact = lazy(() => import('./pages/Contact/Contact'))
 const About = lazy(() => import('./pages/About/About'))
 const Wishlist = lazy(() => import('./pages/Wishlist/Wishlist'))
 const InfoProduct = lazy(() => import('./pages/InfoProduct/InfoProduct'))
+const Korzina = lazy(() => import('./pages/Korzina/Korzina'))
 
 
 export default function App() {
@@ -88,6 +89,14 @@ export default function App() {
           element: (
             <Suspense fallback={<h1>Loading...</h1>}>
               <InfoProduct />
+            </Suspense>
+          ),
+        },
+        {
+          path: '/cart',
+          element: (
+            <Suspense fallback={<h1>Loading...</h1>}>
+              <Korzina />
             </Suspense>
           ),
         },
