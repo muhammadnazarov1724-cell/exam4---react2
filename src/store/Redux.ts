@@ -1,7 +1,5 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { axiosRequest } from "../utils/token";
-import { da } from "zod/locales";
-import Products from "../pages/Products/Products";
 
 type Category = {
     id: number;

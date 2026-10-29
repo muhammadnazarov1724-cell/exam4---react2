@@ -31,7 +31,7 @@ export default function Footer() {
 
         <nav className="flex flex-col items-start" aria-labelledby="footer-account">
           <h2 className={headingClass} id="footer-account">Account</h2>
-          <NavLink className={navLinkClass} to="/login">My Account</NavLink>
+          <NavLink className={navLinkClass} to="/account">My Account</NavLink>
           <button className={navLinkClass} type="button">Cart</button>
           <button className={navLinkClass} type="button">Wishlist</button>
           <NavLink className={navLinkClass} to="/">Shop</NavLink>

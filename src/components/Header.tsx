@@ -5,6 +5,7 @@ import type { AppDispatch, RootState } from '../store/store'
 import { setAccountMenuOpen } from '../store/Redux'
 import Icon from './Icon'
 import logo from '../assets/logo.png'
+import { handleLogout } from '../utils/token'
 
 const navLinkClass = 'relative cursor-pointer whitespace-nowrap border-0 bg-transparent py-[7px] text-sm text-[#161616] no-underline transition-colors duration-200 after:absolute after:inset-x-0 after:bottom-[3px] after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-200 hover:text-brand hover:after:scale-x-100 max-[851px]:self-start max-[851px]:py-2.5'
 const iconButtonClass = 'inline-flex h-[38px] w-[34px] cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-[5px] text-[#151515] transition duration-200 hover:-translate-y-0.5 hover:bg-[#fff1f1] hover:text-brand'
@@ -50,8 +51,8 @@ export default function Header() {
 
         <nav className={`items-center gap-8 max-[1101px]:gap-[22px] max-[851px]:absolute max-[851px]:inset-x-0 max-[851px]:top-[calc(100%+1px)] max-[851px]:items-stretch max-[851px]:gap-1.5 max-[851px]:border-b max-[851px]:border-[#ececec] max-[851px]:bg-white max-[851px]:px-8 max-[851px]:pt-[18px] max-[851px]:pb-6 max-[851px]:shadow-[0_16px_24px_#00000006] ${menuOpen ? 'flex max-[851px]:animate-nav-enter max-[851px]:flex-col' : 'hidden min-[851px]:flex'}`} id="store-navigation" aria-label="Main navigation">
           <NavLink to="/" className={navLinkClass} onClick={() => setMenuOpen(false)}>Home</NavLink>
-          <NavLink to='' className={navLinkClass} type="button">Contact</NavLink>
-          <NavLink to='' className={navLinkClass} type="button">About</NavLink>
+          <NavLink to='/contact' className={navLinkClass} type="button">Contact</NavLink>
+          <NavLink to='/about' className={navLinkClass} type="button">About</NavLink>
           <NavLink to='/register' className={`${navLinkClass} `} type="button">Sign Up</NavLink>
         </nav>
 
@@ -81,10 +82,10 @@ export default function Header() {
 
             {accountMenuOpen && (
               <div id="account-dropdown" className="absolute top-full right-0 z-30 mt-4 w-52 animate-nav-enter rounded bg-black/70 py-2 text-white shadow-lg backdrop-blur-xl">
-                <button type="button" className="flex w-full cursor-pointer items-center gap-3 px-5 py-3 text-left text-sm transition-colors hover:bg-white/15">
+                <NavLink to="/account" onClick={() => dispatch(setAccountMenuOpen(false))} className="flex w-full cursor-pointer items-center gap-3 px-5 py-3 text-left text-sm transition-colors hover:bg-white/15">
                   <Icon name="user" width="20" height="20" />
-                  Account
-                </button>
+                  My Account
+                </NavLink>
                 <button type="button" className="flex w-full cursor-pointer items-center gap-3 px-5 py-3 text-left text-sm transition-colors hover:bg-white/15">
                   <Icon name="bag" width="20" height="20" />
                   My Order
@@ -93,7 +94,7 @@ export default function Header() {
                   <Icon name="heart" width="20" height="20" />
                   Wishlist
                 </button>
-                <button type="button" className="flex w-full cursor-pointer items-center gap-3 px-5 py-3 text-left text-sm transition-colors hover:bg-white/15">
+                <button onClick={handleLogout} type="button" className="flex w-full cursor-pointer items-center gap-3 px-5 py-3 text-left text-sm transition-colors hover:bg-white/15">
                   <Icon name="logout" width="20" height="20" />
                   Logout
                 </button>

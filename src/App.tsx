@@ -7,6 +7,8 @@ const Login = lazy(() => import('./pages/Login/Login'))
 const Register = lazy(() => import('./pages/Register/Register'))
 const Products = lazy(() => import('./pages/Products/Products'))
 const Account = lazy(() => import('./pages/Account/Account'))
+const Contact = lazy(() => import('./pages/Contact/Contact'))
+const About = lazy(() => import('./pages/About/About'))
 
 export default function App() {
   const router = createBrowserRouter([
@@ -51,6 +53,22 @@ export default function App() {
           element: (
             <Suspense fallback={<h1>Loading...</h1>}>
               <Account />
+            </Suspense>
+          ),
+        },
+        {
+          path: '/contact',
+          element: (
+            <Suspense fallback={<h1>Loading...</h1>}>
+              <Contact />
+            </Suspense>
+          ),
+        },
+        {
+          path: '/about',
+          element: (
+            <Suspense fallback={<h1>Loading...</h1>}>
+              <About />
             </Suspense>
           ),
         },
