@@ -12,7 +12,7 @@ const About = lazy(() => import('./pages/About/About'))
 const Wishlist = lazy(() => import('./pages/Wishlist/Wishlist'))
 const InfoProduct = lazy(() => import('./pages/InfoProduct/InfoProduct'))
 const Korzina = lazy(() => import('./pages/Korzina/Korzina'))
-
+const Check = lazy(() => import('./pages/Check/Check'))
 
 export default function App() {
   const router = createBrowserRouter([
@@ -97,6 +97,14 @@ export default function App() {
           element: (
             <Suspense fallback={<h1>Loading...</h1>}>
               <Korzina />
+            </Suspense>
+          ),
+        },
+        {
+          path: '/check',
+          element: (
+            <Suspense fallback={<h1>Loading...</h1>}>
+              <Check />
             </Suspense>
           ),
         },

@@ -155,12 +155,12 @@ export default function Korzina() {
               <span>{formatPrice(subtotal)}</span>
             </div>
 
-            <button
-              type="button"
+            <NavLink
+            to='/check'
               className="mt-2 w-full rounded bg-brand px-5 py-3.5 text-sm text-white"
             >
               Proceed to checkout
-            </button>
+            </NavLink>
           </section>
         </>
       )}

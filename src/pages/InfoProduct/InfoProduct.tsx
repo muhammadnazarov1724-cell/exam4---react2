@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { NavLink, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import type { AppDispatch, RootState } from '../../store/store'
-import { changeDetailsQuaintity, getProductById, setDetailsImageIndex, toggleWishlist } from '../../store/Redux'
+import { addCartItem, changeDetailsQuaintity, getProductById, setDetailsImageIndex, toggleWishlist } from '../../store/Redux'
 import Icon from '../../components/Icon'
 import ProductCard from '../Products/ProductCard'
 
@@ -62,6 +62,7 @@ export default function InfoProduct() {
   const image = product.images[detailsImageIndex] || product.images[0]
   const price = product.hasDiscount ? product.discountPrice : product.price
   const totalPrice = price * detailsQuantity
+
   function handleWishlist() {
     dispatch(toggleWishlist({
        id: product.id,
@@ -72,6 +73,23 @@ export default function InfoProduct() {
        discountPrice: product.discountPrice,
     }))
   }
+
+  function handleBuyNow() {
+
+    dispatch(addCartItem({
+        product: {
+            id: product.id,
+            productName: product.productName,
+            image: product.images[0]?.images || '',
+            price: product.price,
+            hasDiscount: product.hasDiscount,
+            discountPrice: product.discountPrice,
+        },
+        quantity: detailsQuantity
+    }))
+    window.location.href = '/cart'
+  }
+
   const relatedProducts = (products.length > 0 ? products : ourProducts)
     .filter((item) => item.id !== product.id)
     .slice(0, 4)
@@ -165,7 +183,7 @@ export default function InfoProduct() {
               <span className="rounded border border-brand bg-brand px-4 py-1.5 text-sm text-white">{product.size || '—'}</span>
             </div>
           </div>
-          
+
           <div className="mt-7 flex items-center gap-3">
            <div className="flex h-11 w-28 shrink-0 items-center overflow-hidden rounded border border-[#aaa]">
              <button
@@ -184,7 +202,7 @@ export default function InfoProduct() {
 
             <button
               type="button"
-              disabled={product.quantity <= 0}
+              onClick={handleBuyNow}
               className="h-11 min-w-0 flex-1 cursor-pointer rounded bg-brand px-3 text-sm font-medium text-white transition-colors hover:bg-[#c93636] disabled:cursor-not-allowed disabled:opacity-50"
             >
               Buy Now
