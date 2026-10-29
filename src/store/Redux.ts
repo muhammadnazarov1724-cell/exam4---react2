@@ -72,7 +72,8 @@ let initialState = {
     detailsLoading: false,
     detailsError: '',
     detailsRequestId: '',
-    detailsImageIndex: 0
+    detailsImageIndex: 0,
+    detailsQuantity: 1,
 }
 
 export const getCategories = createAsyncThunk('data/getCategories',
@@ -189,6 +190,25 @@ export const getProductById = createAsyncThunk('data/getProductById',
     }
 )
 
+export const getCart = createAsyncThunk('data/getCart', 
+    async function () {
+        const {data} = await axiosRequest.get('/Cart/get-products-from-cart')
+
+        return data
+    }
+)
+
+export const addToCart = createAsyncThunk('data/addToCart',
+    async function (id: number, {dispatch}) {
+        await axiosRequest.post('/Cart/add-product-to-cart', null,
+            {
+                params: {id}
+            }
+        )
+        await dispatch(getCart()).unwrap()
+    }
+)
+
 export const dataSlice = createSlice({
     name: 'data',
     initialState,
@@ -242,6 +262,10 @@ export const dataSlice = createSlice({
         // Для картинки Details
         setDetailsImageIndex(state, action: PayloadAction<number>) {
             state.detailsImageIndex = action.payload
+        },
+        // Для того чтобы сделать +
+        changeDetailsQuaintity(state, action: PayloadAction<number>) {
+            state.detailsQuantity = Math.max(1, state.detailsQuantity + action.payload)
         }
     },
     extraReducers: (builder) => {
@@ -305,6 +329,7 @@ export const dataSlice = createSlice({
           state.productDetails = null
           state.detailsImageIndex = 0
           state.detailsRequestId = action.meta.requestId
+          state.detailsQuantity = 1
         })
         .addCase(getProductById.fulfilled, (state, action) => {
           if (state.detailsRequestId !== action.meta.requestId) return
@@ -324,4 +349,4 @@ export const dataSlice = createSlice({
 
 export default dataSlice.reducer
 
-export const { toggleCategory, setActiveSlide, toggleCategoriesList, setMinPrice, setMaxPrice, setPriceError, setSaleTime, setAccountMenuOpen, toggleWishlist, removeFromWishlist, setDetailsImageIndex} = dataSlice.actions
+export const { toggleCategory, setActiveSlide, toggleCategoriesList, setMinPrice, setMaxPrice, setPriceError, setSaleTime, setAccountMenuOpen, toggleWishlist, removeFromWishlist, setDetailsImageIndex, changeDetailsQuaintity} = dataSlice.actions

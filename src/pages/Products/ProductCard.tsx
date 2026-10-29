@@ -1,4 +1,4 @@
-import { removeFromWishlist, toggleWishlist, type Product } from '../../store/Redux'
+import { addToCart, removeFromWishlist, toggleWishlist, type Product } from '../../store/Redux'
 import Icon from '../../components/Icon'
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '../../store/store';
@@ -43,8 +43,6 @@ function handleWishlist() {
         <button
           type="button"
           onClick={handleWishlist}
-          aria-label={wishlistPage ? 'Удалить из избранного' : 'Добавить или убрать из избранного'}
-          aria-pressed={wishlistPage ? undefined : inWishlist}
           className={`grid size-8 cursor-pointer place-items-center rounded-full bg-white transition-colors hover:bg-brand hover:text-white ${
             inWishlist && !wishlistPage ? 'text-brand' : 'text-black'
           }`}
@@ -64,7 +62,7 @@ function handleWishlist() {
         </NavLink>
         </div>
 
-        <button className={`absolute inset-x-0 bottom-0 min-h-10 cursor-pointer bg-black px-4 py-2.5 text-[13px] text-white transition duration-200 hover:bg-brand ${
+        <button onClick={() => dispatch(addToCart(product.id))} className={`absolute inset-x-0 bottom-0 min-h-10 cursor-pointer bg-black px-4 py-2.5 text-[13px] text-white transition duration-200 hover:bg-brand ${
          wishlistPage ? '' : 'sm:translate-y-full sm:group-hover:translate-y-0 sm:group-focus-within:translate-y-0'
          }`} type="button">Add To Cart</button>
       </div>

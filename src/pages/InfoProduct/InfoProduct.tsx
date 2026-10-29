@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { NavLink, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import type { AppDispatch, RootState } from '../../store/store'
-import { getProductById, setDetailsImageIndex } from '../../store/Redux'
+import { changeDetailsQuaintity, getProductById, setDetailsImageIndex, toggleWishlist } from '../../store/Redux'
 import Icon from '../../components/Icon'
 import ProductCard from '../Products/ProductCard'
 
@@ -18,7 +18,12 @@ export default function InfoProduct() {
     detailsImageIndex,
     products,
     ourProducts,
+    detailsQuantity,
   } = useSelector((state: RootState) => state.data)
+
+  const inWishlist = useSelector((state: RootState) => 
+    state.data.wishlist.some((item) => item.id === productId)
+)
 
   useEffect(() => {
     if (Number.isInteger(productId) && productId > 0) {
@@ -56,6 +61,17 @@ export default function InfoProduct() {
   const product = productDetails
   const image = product.images[detailsImageIndex] || product.images[0]
   const price = product.hasDiscount ? product.discountPrice : product.price
+  const totalPrice = price * detailsQuantity
+  function handleWishlist() {
+    dispatch(toggleWishlist({
+       id: product.id,
+       productName: product.productName,
+       image: product.images[0]?.images || '',
+       price: product.price,
+       hasDiscount: product.hasDiscount,
+       discountPrice: product.discountPrice,
+    }))
+  }
   const relatedProducts = (products.length > 0 ? products : ourProducts)
     .filter((item) => item.id !== product.id)
     .slice(0, 4)
@@ -118,17 +134,17 @@ export default function InfoProduct() {
             </span>
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <span className="text-2xl font-semibold">
-              ${price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-            </span>
+           <div className="mt-4 flex flex-wrap items-center gap-3">
+               <span className="text-2xl font-semibold">
+               ${totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2,})}
+               </span>
 
-            {product.hasDiscount && (
-              <span className="text-[#888] line-through">
-                ${product.price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-              </span>
-            )}
-          </div>
+               {product.hasDiscount && (
+               <span className="text-[#888] line-through">
+                   ${(product.price * detailsQuantity).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, })}
+               </span>
+               )}
+           </div>
 
           <p className="mt-4 border-b border-[#bdbdbd] pb-5 text-[13px] leading-6 text-[#666]">
             {product.description}
@@ -149,13 +165,22 @@ export default function InfoProduct() {
               <span className="rounded border border-brand bg-brand px-4 py-1.5 text-sm text-white">{product.size || '—'}</span>
             </div>
           </div>
-
+          
           <div className="mt-7 flex items-center gap-3">
-            <div className="flex h-11 w-28 shrink-0 items-center overflow-hidden rounded border border-[#aaa]">
-              <button type="button" aria-label="Уменьшить количество" className="grid h-full w-8 cursor-pointer place-items-center text-xl transition-colors hover:bg-[#f5f5f5]">−</button>
-              <span className="flex-1 text-center text-base font-medium">1</span>
-              <button type="button" aria-label="Увеличить количество" className="grid h-full w-8 cursor-pointer place-items-center bg-brand text-xl text-white transition-colors hover:bg-[#c93636]">+</button>
-            </div>
+           <div className="flex h-11 w-28 shrink-0 items-center overflow-hidden rounded border border-[#aaa]">
+             <button
+               type="button"
+               onClick={() => dispatch(changeDetailsQuaintity(-1))}
+               disabled={detailsQuantity <= 1}
+               className="grid h-full w-8 cursor-pointer place-items-center text-xl hover:bg-[#f5f5f5] disabled:cursor-not-allowed disabled:opacity-40">−</button>
+             <span className="flex-1 text-center text-base font-medium">
+               {detailsQuantity}
+             </span>
+             <button
+               type="button"
+               onClick={() => dispatch(changeDetailsQuaintity(1))}
+               className="grid h-full w-8 cursor-pointer place-items-center bg-brand text-xl text-white hover:bg-[#c93636]">+</button>
+           </div>
 
             <button
               type="button"
@@ -165,8 +190,13 @@ export default function InfoProduct() {
               Buy Now
             </button>
 
-            <button type="button" aria-label="Добавить в избранное" className="grid size-11 shrink-0 cursor-pointer place-items-center rounded border border-[#aaa] transition-colors hover:border-brand hover:text-brand">
-              <Icon name="heart" width="22" height="22" />
+            <button
+              type="button"
+              onClick={handleWishlist}
+              className={`grid size-11 shrink-0 cursor-pointer place-items-center rounded border transition-colors hover:border-brand hover:text-brand ${
+                inWishlist ? 'border-brand text-brand' : 'border-[#aaa]'}`}>
+              <Icon
+                name="heart" width="22" height="22" fill={inWishlist ? 'currentColor' : 'none'}/>
             </button>
           </div>
 
